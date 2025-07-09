@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Dashboard - Library Management System</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Student Dashboard</h1>
+      <nav>
+        <ul>
+          <li><a href="{{ url_for('student') }}">Home</a></li>
+          <li><a href="#">Books</a></li>
+          <li><a href="#">Profile</a></li>
+          <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+      </nav>
+      <section>
+        <h2>Welcome, {{ user.fullname }}!</h2>
+        <p>Here you can browse and borrow books from the library.</p>
+        <h3>Available Books</h3>
+        <table id="booksTable">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Author</th>
+              <th>ISBN</th>
+              <th>Copies</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <h3>Your Borrowed Books</h3>
+        <table id="borrowedBooksTable">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Borrow Date</th>
+              <th>Due Date</th>
+              <th>Return</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+      <script>
+        async function loadBooks() {
+          const response = await fetch('{{ url_for("get_books") }}');
+          const books = await response.json();
+          const tbody = document.querySelector("#booksTable tbody");
+          tbody.innerHTML = "";
+          books.forEach((book) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${book.title}</td>
+              <td>${book.author}</td>
+              <td>${book.isbn}</td>
+              <td>${book.copies}</td>
+              <td><button onclick="borrowBook(${book.id})">Borrow</button></td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+        async function loadBorrowedBooks() {
+          const response = await fetch("/api/student/borrowed_books");
+          if (!response.ok) return;
+          const borrowedBooks = await response.json();
+          const tbody = document.querySelector("#borrowedBooksTable tbody");
+          tbody.innerHTML = "";
+          borrowedBooks.forEach((record) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${record.book.title}</td>
+              <td>${new Date(record.borrow_date).toLocaleDateString()}</td>
+              <td>${new Date(record.due_date).toLocaleDateString()}</td>
+              <td><button onclick="returnBook(${
+                record.id
+              })">Return</button></td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+        async function borrowBook(bookId) {
+          const response = await fetch(`/student/borrow/${bookId}`, {
+            method: "POST",
+          });
+          if (response.ok) {
+            alert("Book borrowed successfully");
+            loadBooks();
+            loadBorrowedBooks();
+          } else {
+            alert("Failed to borrow book");
+          }
+        }
+        async function returnBook(borrowId) {
+          const response = await fetch(`/student/return/${borrowId}`, {
+            method: "POST",
+          });
+          if (response.ok) {
+            alert("Book returned successfully");
+            loadBooks();
+            loadBorrowedBooks();
+          } else {
+            alert("Failed to return book");
+          }
+        }
+        document.addEventListener("DOMContentLoaded", () => {
+          loadBooks();
+          loadBorrowedBooks();
+        });
+      </script>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,39 @@
+oor<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Recommendations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='recommendation.css') }}" />
+  </head>
+  <body>
+    <h1>Book Recommendations</h1>
+    <div id="recommendations"></div>
+
+    <script>
+      async function fetchRecommendations(type) {
+        const response = await fetch(`/book_recommendation/${type}`);
+        const data = await response.json();
+        const container = document.getElementById("recommendations");
+        container.innerHTML += `<h2>${type
+          .replace("_", " ")
+          .toUpperCase()}</h2>`;
+        if (data.recommendations.length === 0) {
+          container.innerHTML += "<p>No recommendations available.</p>";
+        } else {
+          const list = document.createElement("ul");
+          data.recommendations.forEach((book) => {
+            const item = document.createElement("li");
+            item.textContent = book.title + " by " + book.author;
+            list.appendChild(item);
+          });
+          container.appendChild(list);
+        }
+      }
+
+      fetchRecommendations("collaborative");
+      fetchRecommendations("content_based");
+      fetchRecommendations("hybrid");
+    </script>
+  </body>
+</html>

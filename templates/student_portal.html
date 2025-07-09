@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Student Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 10px;
+        }
+        .top-buttons {
+            margin-bottom: 20px;
+        }
+        .top-buttons button {
+            margin: 0 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .feature-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .feature-buttons button {
+            padding: 15px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            min-width: 140px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome, Student!</h1>
+    <div class="top-buttons">
+        <button onclick="location.href='{{ url_for('home_ui.student_portal') }}'">Home</button>
+        <button onclick="location.href='{{ url_for('student_login.logout') }}'">Logout</button>
+    </div>
+    <div class="feature-buttons">
+        <button onclick="location.href='#'">Get Book</button>
+        <button onclick="location.href='/dataset_management'">Submit Book</button>
+        <button onclick="location.href='#'">Borrow Book</button>
+        <button onclick="location.href='{{ url_for('history.get_borrow_history') }}'">History</button>
+        <button onclick="location.href='/due_date_fine_tracking/'">Fine Calculation</button>
+    </div>
+</body>
+</html>

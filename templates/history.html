@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Borrow History and Fees</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #borrowHistory, #fees {
+            max-width: 700px;
+            margin: 20px auto;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        h2 {
+            margin-top: 0;
+        }
+    </style>
+    <script>
+        async function loadBorrowHistory() {
+            const response = await fetch('/api/history/borrow');
+            const data = await response.json();
+            const tableBody = document.getElementById('borrowHistoryBody');
+            tableBody.innerHTML = '';
+            data.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.serial_number || ''}</td>
+                    <td>${record.book_id || ''}</td>
+                    <td>${record.book_title || ''}</td>
+                    <td>${record.borrow_date || ''}</td>
+                    <td>${record.return_date || ''}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        async function loadFees() {
+            const response = await fetch('/api/history/fees');
+            const data = await response.json();
+            document.getElementById('totalFees').textContent = data.total_fees || 0;
+            const feesDetails = document.getElementById('feesDetails');
+            feesDetails.innerHTML = '';
+            data.details.forEach(fee => {
+                const li = document.createElement('li');
+                li.textContent = `${fee.date || ''}: $${fee.amount} - ${fee.reason || ''}`;
+                feesDetails.appendChild(li);
+            });
+        }
+
+        window.onload = function() {
+            loadBorrowHistory();
+            loadFees();
+        };
+    </script>
+</head>
+<body>
+    <h1>Borrow History and Fees</h1>
+    <div id="borrowHistory">
+        <h2>Borrow History</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Serial Number</th>
+                    <th>Book ID</th>
+                    <th>Book Title</th>
+                    <th>Borrow Date</th>
+                    <th>Return Date</th>
+                </tr>
+            </thead>
+            <tbody id="borrowHistoryBody">
+                <!-- Borrow history data -->
+            </tbody>
+        </table>
+    </div>
+    <div id="fees">
+        <h2>Fees</h2>
+        <p>Total Fees: $<span id="totalFees">0</span></p>
+        <ul id="feesDetails"></ul>
+    </div>
+</body>
+</html>

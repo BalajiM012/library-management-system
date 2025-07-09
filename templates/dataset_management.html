@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dataset Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            margin-bottom: 20px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input[type="text"], input[type="number"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            text-align: center;
+            margin-top: 10px;
+            color: green;
+        }
+    </style>
+    <script>
+        async function addBook(event) {
+            event.preventDefault();
+            const data = {
+                title: document.getElementById('bookTitle').value,
+                author: document.getElementById('bookAuthor').value,
+                isbn: document.getElementById('bookISBN').value,
+                copies: parseInt(document.getElementById('bookCopies').value)
+            };
+            const response = await fetch('/api/dataset_management/add_book', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            document.getElementById('bookMessage').textContent = result.message;
+            event.target.reset();
+        }
+
+        async function addUser(event) {
+            event.preventDefault();
+            const data = {
+                fullname: document.getElementById('userFullname').value,
+                email: document.getElementById('userEmail').value,
+                username: document.getElementById('userUsername').value,
+                password: document.getElementById('userPassword').value
+            };
+            const response = await fetch('/api/dataset_management/add_user', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            document.getElementById('userMessage').textContent = result.message;
+            event.target.reset();
+        }
+    </script>
+</head>
+<body>
+    <h1>Dataset Management</h1>
+
+    <form id="addBookForm" onsubmit="addBook(event)">
+        <h2>Add Book</h2>
+        <label for="bookTitle">Title:</label>
+        <input type="text" id="bookTitle" required />
+        <label for="bookAuthor">Author:</label>
+        <input type="text" id="bookAuthor" required />
+        <label for="bookISBN">ISBN:</label>
+        <input type="text" id="bookISBN" required />
+        <label for="bookCopies">Copies:</label>
+        <input type="number" id="bookCopies" min="1" required />
+        <button type="submit">Add Book</button>
+        <div id="bookMessage" class="message"></div>
+    </form>
+
+    <form id="addUserForm" onsubmit="addUser(event)">
+        <h2>Add User</h2>
+        <label for="userFullname">Full Name:</label>
+        <input type="text" id="userFullname" required />
+        <label for="userEmail">Email:</label>
+        <input type="email" id="userEmail" required />
+        <label for="userUsername">Username:</label>
+        <input type="text" id="userUsername" required />
+        <label for="userPassword">Password:</label>
+        <input type="password" id="userPassword" required />
+        <button type="submit">Add User</button>
+        <div id="userMessage" class="message"></div>
+    </form>
+</body>
+</html>

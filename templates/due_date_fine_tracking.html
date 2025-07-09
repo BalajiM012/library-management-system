@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Due Date Fine Tracking Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+    <script>
+        async function loadBorrowRecords() {
+            const response = await fetch('/due_date_fine_tracking/api/borrow_records');
+            const records = await response.json();
+            const tableBody = document.getElementById('borrowRecordsBody');
+            tableBody.innerHTML = '';
+            records.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.id}</td>
+                    <td>${record.user_id}</td>
+                    <td>${record.book_id}</td>
+                    <td>${record.borrow_date}</td>
+                    <td>${record.due_date}</td>
+                    <td>${record.return_date || ''}</td>
+                    <td>${record.fine}</td>
+                    <td>
+                        ${record.return_date ? 'Returned' : `<button onclick="returnBook(${record.id})">Return Book</button>`}
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        async function returnBook(borrowId) {
+            const response = await fetch(`/due_date_fine_tracking/api/return_book/${borrowId}`, {
+                method: 'POST'
+            });
+            const result = await response.json();
+            alert(result.message + (result.fine !== undefined ? ` Fine: $${result.fine}` : ''));
+            loadBorrowRecords();
+        }
+
+        window.onload = loadBorrowRecords;
+    </script>
+</head>
+<body>
+    <h1>Due Date Fine Tracking Dashboard</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User ID</th>
+                <th>Book ID</th>
+                <th>Borrow Date</th>
+                <th>Due Date</th>
+                <th>Return Date</th>
+                <th>Fine</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="borrowRecordsBody">
+            <!-- Borrow records will be loaded here -->
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,0 +1,5 @@
+Flask
+Flask-Session
+Werkzeug
+Flask-SQLAlchemy
+psycopg2-binary

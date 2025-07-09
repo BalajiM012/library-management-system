@@ -1,0 +1,66 @@
+board<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Library Management System</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles.css') }}"
+    />
+  </head>
+<body>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      text-align: center;
+    }
+    .top-welcome {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+    .top-buttons {
+      margin-bottom: 20px;
+    }
+    .top-buttons button {
+      margin: 0 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .feature-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .feature-buttons button {
+      padding: 15px 25px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      border-radius: 5px;
+      min-width: 140px;
+    }
+  </style>
+  <div class="top-welcome">Welcome, {{ user.fullname }}!</div>
+  <div class="top-buttons">
+    <button onclick="location.href='{{ url_for('home_ui.admin') }}'">Home</button>
+    <button onclick="location.href='{{ url_for('admin_login.logout') }}'">Logout</button>
+  </div>
+  <div class="feature-buttons">
+    <button onclick="location.href='{{ url_for('home_ui.admin') }}'">Book Inventory</button>
+    <button onclick="location.href='{{ url_for('home_ui.admin') }}'">Book Management</button>
+    <button onclick="location.href='#'">Demand Forecast</button>
+    <button onclick="location.href='#'">Fine Calculation</button>
+    <button onclick="location.href='#'">Manage Users</button>
+    <button onclick="location.href='{{ url_for('home_ui.dataset_management') }}'">Dataset Management</button>
+    <button onclick="location.href='{{ url_for('history.get_borrow_history') }}'">History</button>
+  </div>
+</body>
+</html>
