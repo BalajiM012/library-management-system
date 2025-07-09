@@ -51,7 +51,7 @@
             const author = document.getElementById("author").value;
             const isbn = document.getElementById("isbn").value;
             const copies = parseInt(document.getElementById("copies").value);
-            const response = await fetch('{{ url_for("add_book_page") }}', {
+            const response = await fetch('/api/book_management/books', {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ title, author, isbn, copies }),

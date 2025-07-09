@@ -1,15 +1,11 @@
-from flask import Blueprint, render_template, jsonify, request
+from flask import Blueprint, jsonify, request
+from src.models import BorrowRecord  # Assuming this model exists and has fine info
 from datetime import datetime
 
-due_date_fine_tracking_bp = Blueprint('due_date_fine_tracking', __name__, url_prefix='/due_date_fine_tracking')
+due_date_fine_tracking_bp = Blueprint('due_date_fine_tracking', __name__, url_prefix='/due_date_fine_tracking/api')
 
-@due_date_fine_tracking_bp.route('/')
-def dashboard():
-    return render_template('due_date_fine_tracking.html')
-
-@due_date_fine_tracking_bp.route('/api/borrow_records', methods=['GET'])
+@due_date_fine_tracking_bp.route('/borrow_records', methods=['GET'])
 def get_borrow_records():
-    from app import BorrowRecord
     records = BorrowRecord.query.all()
     result = []
     for r in records:
@@ -17,26 +13,25 @@ def get_borrow_records():
             'id': r.id,
             'user_id': r.user_id,
             'book_id': r.book_id,
-            'borrow_date': r.borrow_date.isoformat(),
-            'due_date': r.due_date.isoformat(),
+            'borrow_date': r.borrow_date.isoformat() if r.borrow_date else None,
+            'due_date': r.due_date.isoformat() if r.due_date else None,
             'return_date': r.return_date.isoformat() if r.return_date else None,
             'fine': r.fine
         })
     return jsonify(result)
 
-@due_date_fine_tracking_bp.route('/api/return_book/<int:borrow_id>', methods=['POST'])
+@due_date_fine_tracking_bp.route('/return_book/<int:borrow_id>', methods=['POST'])
 def return_book(borrow_id):
-    from app import db, Book, BorrowRecord
     record = BorrowRecord.query.get_or_404(borrow_id)
     if record.return_date:
-        return jsonify({'message': 'Book already returned'}), 400
+        return jsonify({'message': 'Book already returned', 'fine': record.fine})
     record.return_date = datetime.utcnow()
-    if record.return_date > record.due_date:
-        days_overdue = (record.return_date - record.due_date).days
-        record.fine = days_overdue * 1.0
+    # Calculate fine if returned late
+    if record.due_date and record.return_date > record.due_date:
+        delta = (record.return_date - record.due_date).days
+        record.fine = delta * 1  # Assuming $1 fine per day late
     else:
-        record.fine = 0.0
-    book = Book.query.get(record.book_id)
-    book.copies += 1
+        record.fine = 0
+    from src.app_factory import db
     db.session.commit()
     return jsonify({'message': 'Book returned successfully', 'fine': record.fine})

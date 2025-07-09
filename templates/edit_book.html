@@ -70,7 +70,7 @@
             const isbn = document.getElementById("isbn").value;
             const copies = parseInt(document.getElementById("copies").value);
             const response = await fetch(
-              '{{ url_for("update_book", book_id=book.id) }}',
+              `/api/book_management/books/{{ book.id }}`,
               {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
